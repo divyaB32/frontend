@@ -1,0 +1,158 @@
+/* ===== OVERLAY (transparent with blur effect) ===== */
+.enquire-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(43, 34, 27, 0.55); /* brown tint */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 3000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ===== MODAL CONTAINER ===== */
+.enquire-container {
+  background: #faf8f6;
+  width: 420px;
+  max-width: 92%;
+  padding: 40px 36px;
+  border-radius: 20px;
+  box-shadow:
+    0 25px 60px rgba(0, 0, 0, 0.35);
+  position: relative;
+
+  font-family: "Playfair Display", serif;
+  animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ===== CLOSE BUTTON ===== */
+.enquire-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.05);
+  font-size: 20px;
+  cursor: pointer;
+  color: #6b5d50;
+  transition: all 0.25s ease;
+}
+
+.enquire-close:hover {
+  background: rgba(0, 0, 0, 0.12);
+  transform: rotate(90deg);
+}
+
+/* ===== HEADINGS ===== */
+.enquire-container h3 {
+  margin-bottom: 28px;
+  font-size: 28px;
+  text-align: center;
+  font-weight: 600;
+  color: #4a3b2f;
+}
+
+/* ===== INPUTS ===== */
+.enquire-container input {
+  width: 100%;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  border-radius: 12px;
+  border: 2px solid rgba(107, 93, 80, 0.25);
+  font-size: 15px;
+  outline: none;
+  background: #fff;
+  transition: all 0.3s ease;
+}
+
+.enquire-container input::placeholder {
+  color: #9a8f86;
+}
+
+.enquire-container input:focus {
+  border-color: #6b5d50;
+  box-shadow: 0 0 0 4px rgba(107, 93, 80, 0.15);
+}
+
+/* ===== BUTTON ===== */
+.enquire-container button:not(.enquire-close) {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #6b5d50, #8b7d70);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 6px;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 18px rgba(107, 93, 80, 0.4);
+}
+
+.enquire-container button:hover {
+  background: linear-gradient(135deg, #5a4d40, #7a6d60);
+  transform: translateY(-2px);
+}
+
+.enquire-container button:active {
+  transform: translateY(0);
+}
+
+/* ===== CONTACT SECTION ===== */
+.enquire-contact {
+  text-align: center;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.enquire-contact p {
+  margin: 10px 0;
+  font-size: 15px;
+  color: #6b5d50;
+}
+
+.enquire-contact a {
+  color: #6b5d50;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+
+.enquire-contact a:hover {
+  border-bottom-color: #6b5d50;
+}
+
+/* ===== MOBILE ===== */
+@media (max-width: 480px) {
+  .enquire-container {
+    padding: 32px 24px;
+  }
+
+  .enquire-container h3 {
+    font-size: 24px;
+  }
+}

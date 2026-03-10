@@ -1,0 +1,78 @@
+/* CTA SECTION - MATCHES REFERENCE */
+.home-cta {
+  background-color: #6b5744;
+  color: #ffffff;
+  text-align: center;
+  padding: 120px 24px;
+}
+
+.home-cta h2 {
+  font-family: "Playfair Display", serif;
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 28px 0;
+  color: #ffffff;
+}
+
+.home-cta p {
+  max-width: 720px;
+  margin: 0 auto 48px;
+  font-size: 17px;
+  line-height: 1.7;
+  color: #d4cec6;
+}
+
+.cta-btn {
+  background-color: #ffffff;
+  color: #4a3c2f;
+  border: none;
+  padding: 16px 36px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.cta-btn:hover {
+  background-color: #f5f2ee;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* PULSE ANIMATION ON SCROLL */
+.cta-btn.blink {
+  animation: pulse 1.4s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .home-cta {
+    padding: 80px 24px;
+  }
+
+  .home-cta h2 {
+    font-size: 36px;
+  }
+
+  .home-cta p {
+    font-size: 16px;
+  }
+}

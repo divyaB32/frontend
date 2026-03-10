@@ -1,0 +1,27 @@
+/* Global reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Page base */
+body {
+  font-family: "Inter", sans-serif;
+  background-color: #ffffff;   /* 🔥 FIX: white background */
+  color: #1f1f1f;
+}
+
+/* Page content spacing */
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 24px;
+}
+/* Offset for pages below fixed navbar */
+.page-offset {
+  padding-top: 100px; /* 🔥 THIS is the real fix */
+}
+.app-content {
+  margin-top: 90px; /* EXACT navbar height */
+}
