@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { Send, MapPin, Phone, Mail } from "lucide-react";
 import "./Contact.css";
-
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const getImageUrl = (img) => {
   if (!img) return "";

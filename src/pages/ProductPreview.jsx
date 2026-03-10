@@ -12,22 +12,24 @@ export default function ProductPreview() {
   const [activeImage, setActiveImage] = useState("");
   const [showVisualize, setShowVisualize] = useState(false);
 
-  useEffect(() => {
-    fetch(`http://localhost:5000/api/products/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        setProduct(data);
-        setActiveImage(
-          data.previewImages?.[0]
-            ? `http://localhost:5000${data.previewImages[0]}`
-            : `http://localhost:5000${data.tileImage}`
-        );
-      });
+ useEffect(() => {
+  const API = import.meta.env.VITE_API_URL;
 
-    fetch("http://localhost:5000/api/products")
-      .then((res) => res.json())
-      .then((data) => setAllProducts(data));
-  }, [id]);
+  fetch(`${API}/api/products/${id}`)
+    .then((res) => res.json())
+    .then((data) => {
+      setProduct(data);
+      setActiveImage(
+        data.previewImages?.[0]
+          ? `${API}${data.previewImages[0]}`
+          : `${API}${data.tileImage}`
+      );
+    });
+
+  fetch(`${API}/api/products`)
+    .then((res) => res.json())
+    .then((data) => setAllProducts(data));
+}, [id]);
 
   if (!product) return <div className="preview-loading">Loading…</div>;
 
@@ -55,17 +57,19 @@ export default function ProductPreview() {
         <div className="preview-left">
           <div className="image-frame">
             <div className="thumb-column">
-              {(product.previewImages || []).map((img, i) => (
-                <img
-                  key={i}
-                  src={`http://localhost:5000${img}`}
-                  alt=""
-                  className={activeImage === `http://localhost:5000${img}` ? "active" : ""}
-                  onClick={() =>
-                    setActiveImage(`http://localhost:5000${img}`)
-                  }
-                />
-              ))}
+              {(product.previewImages || []).map((img, i) => {
+  const API = import.meta.env.VITE_API_URL;
+
+  return (
+    <img
+      key={i}
+      src={`${API}${img}`}
+      alt=""
+      className={activeImage === `${API}${img}` ? "active" : ""}
+      onClick={() => setActiveImage(`${API}${img}`)}
+    />
+  );
+})}
             </div>
 
             <div className="main-image-box">
@@ -101,11 +105,11 @@ export default function ProductPreview() {
                 onClick={() => navigate(`/product/${item._id}`)}
               >
                 <div className="related-image">
-                  <img
-                    src={`http://localhost:5000${item.tileImage}`}
-                    alt={item.name}
-                  />
-                </div>
+  <img
+    src={`${import.meta.env.VITE_API_URL}${item.tileImage}`}
+    alt={item.name}
+  />
+</div>
                 <p>{item.name}</p>
               </div>
             ))}
