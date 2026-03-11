@@ -3,14 +3,15 @@ import "./visualize.css";
 
 /* ===============================
    BACKEND BASE URL
+   Trim trailing slash to avoid double-slash URLs
 ================================ */
-const API_BASE = import.meta.env.VITE_API_URL;
+const API_BASE = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
 
 /* ===============================
-   ROOM CONFIG (FIXED)
-   Images now load from backend
+   ROOM CONFIG
+   Defined as a function so API_BASE is always resolved correctly
 ================================ */
-const ROOMS = [
+const getRooms = () => [
   {
     id: "small",
     label: "Small Room",
@@ -42,32 +43,40 @@ const ROOMS = [
 ];
 
 export default function Visualize({ open, onClose, product }) {
-  if (!open || !product) return null;
+  const ROOMS = getRooms();
 
   const [selectedRoom, setSelectedRoom] = useState(ROOMS[0]);
   const [surface, setSurface] = useState("floor");
 
+  if (!open || !product) return null;
+
   /* ===============================
      TILE IMAGE FROM BACKEND
+     Handle both absolute URLs and relative paths
   ================================ */
   const tileUrl = product.tileImage
-    ? `${API_BASE}${product.tileImage}`
+    ? product.tileImage.startsWith("http")
+      ? product.tileImage
+      : `${API_BASE}${product.tileImage}`
     : "";
 
+  const activeMask =
+    surface === "wall" ? selectedRoom.wallMask : selectedRoom.floorMask;
+
   return (
-    <div className="visualize-overlay">
-      <div className="visualize-modal">
+    <div className="visualize-overlay" onClick={onClose}>
+      <div className="visualize-modal" onClick={(e) => e.stopPropagation()}>
         <button className="visualize-close" onClick={onClose}>✕</button>
 
         {/* ROOM SELECTOR */}
         <div className="room-selector">
-          {ROOMS.map(room => (
+          {ROOMS.map((room) => (
             <div
               key={room.id}
               className={`room-thumb ${selectedRoom.id === room.id ? "active" : ""}`}
               onClick={() => setSelectedRoom(room)}
             >
-              <img src={room.base} alt={room.label} />
+              <img src={room.base} alt={room.label} crossOrigin="anonymous" />
               <span>{room.label}</span>
             </div>
           ))}
@@ -92,41 +101,60 @@ export default function Visualize({ open, onClose, product }) {
         {/* VISUALIZATION */}
         <div className="visualize-wrapper">
           <div className="room-wrapper">
-            {/* Room Base */}
+            {/* Room Base Image */}
             <img
               src={selectedRoom.base}
               className="room-base"
               alt="Room"
+              crossOrigin="anonymous"
             />
 
-            {/* Tile Overlay */}
-            <div
-              className="tile-overlay"
-              style={{
-                backgroundImage: tileUrl ? `url(${tileUrl})` : "none",
-                WebkitMaskImage: `url(${
-                  surface === "wall"
-                    ? selectedRoom.wallMask
-                    : selectedRoom.floorMask
-                })`,
-                WebkitMaskSize: "cover",
-                WebkitMaskRepeat: "no-repeat",
-                maskImage: `url(${
-                  surface === "wall"
-                    ? selectedRoom.wallMask
-                    : selectedRoom.floorMask
-                })`,
-                maskSize: "cover",
-                maskRepeat: "no-repeat",
-              }}
-            />
+            {/* Tile Overlay with CSS Mask */}
+            {tileUrl && (
+              <div
+                className="tile-overlay"
+                style={{
+                  backgroundImage: `url(${tileUrl})`,
+                  WebkitMaskImage: `url(${activeMask})`,
+                  WebkitMaskSize: "cover",
+                  WebkitMaskRepeat: "no-repeat",
+                  WebkitMaskPosition: "center",
+                  maskImage: `url(${activeMask})`,
+                  maskSize: "cover",
+                  maskRepeat: "no-repeat",
+                  maskPosition: "center",
+                }}
+              />
+            )}
+
+            {/* Fallback message if no tile image */}
+            {!tileUrl && (
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: "rgba(0,0,0,0.15)",
+                  color: "#fff",
+                  fontSize: "14px",
+                  borderRadius: "14px",
+                }}
+              >
+                No tile image available
+              </div>
+            )}
           </div>
 
           <div className="visualize-info">
             <h2>{product.name}</h2>
-            <p>
-              Select a room and preview this tile on the {surface}.
-            </p>
+            <p>Select a room and preview this tile on the {surface}.</p>
+            {!API_BASE && (
+              <p style={{ color: "red", fontSize: "12px" }}>
+                ⚠️ VITE_API_URL is not set in your .env file
+              </p>
+            )}
           </div>
         </div>
       </div>
