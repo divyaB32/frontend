@@ -7,36 +7,37 @@ import "./visualize.css";
 const API_BASE = import.meta.env.VITE_API_URL;
 
 /* ===============================
-   ROOM CONFIG
+   ROOM CONFIG (FIXED)
+   Images now load from backend
 ================================ */
 const ROOMS = [
   {
     id: "small",
     label: "Small Room",
-    base: "/rooms/living/small_room.jpg",
-    floorMask: "/mask/Floor/small_room_floor_mask.png",
-    wallMask: "/mask/Wall/small_room_wall.png",
+    base: `${API_BASE}/rooms/living/small_room.jpg`,
+    floorMask: `${API_BASE}/mask/Floor/small_room_floor_mask.png`,
+    wallMask: `${API_BASE}/mask/Wall/small_room_wall.png`,
   },
   {
     id: "medium",
     label: "Medium Room",
-    base: "/rooms/living/medium_room.jpg",
-    floorMask: "/mask/Floor/medium_room_floor_mask.png",
-    wallMask: "/mask/Wall/medium_room_wall.png",
+    base: `${API_BASE}/rooms/living/medium_room.jpg`,
+    floorMask: `${API_BASE}/mask/Floor/medium_room_floor_mask.png`,
+    wallMask: `${API_BASE}/mask/Wall/medium_room_wall.png`,
   },
   {
     id: "large",
     label: "Large Room",
-    base: "/rooms/living/large_room.jpg",
-    floorMask: "/mask/Floor/large_room_floor_mask.png",
-    wallMask: "/mask/Wall/large_room_wall.png",
+    base: `${API_BASE}/rooms/living/large_room.jpg`,
+    floorMask: `${API_BASE}/mask/Floor/large_room_floor_mask.png`,
+    wallMask: `${API_BASE}/mask/Wall/large_room_wall.png`,
   },
   {
     id: "extra",
-    label: "Extra Large",
-    base: "/rooms/living/extra_large_room.jpg",
-    floorMask: "/mask/Floor/extra_large_room_floor_mask.png",
-    wallMask: "/mask/Wall/extra_large_room_wall.png",
+    label: "Extra Large Room",
+    base: `${API_BASE}/rooms/living/extra_large_room.jpg`,
+    floorMask: `${API_BASE}/mask/Floor/extra_large_room_floor_mask.png`,
+    wallMask: `${API_BASE}/mask/Wall/extra_large_room_wall.png`,
   },
 ];
 
@@ -91,12 +92,14 @@ export default function Visualize({ open, onClose, product }) {
         {/* VISUALIZATION */}
         <div className="visualize-wrapper">
           <div className="room-wrapper">
+            {/* Room Base */}
             <img
               src={selectedRoom.base}
               className="room-base"
               alt="Room"
             />
 
+            {/* Tile Overlay */}
             <div
               className="tile-overlay"
               style={{
@@ -106,11 +109,15 @@ export default function Visualize({ open, onClose, product }) {
                     ? selectedRoom.wallMask
                     : selectedRoom.floorMask
                 })`,
+                WebkitMaskSize: "cover",
+                WebkitMaskRepeat: "no-repeat",
                 maskImage: `url(${
                   surface === "wall"
                     ? selectedRoom.wallMask
                     : selectedRoom.floorMask
                 })`,
+                maskSize: "cover",
+                maskRepeat: "no-repeat",
               }}
             />
           </div>
