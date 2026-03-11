@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Send, MapPin, Phone, Mail } from "lucide-react";
 import "./Contact.css";
+
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 const getImageUrl = (img) => {
@@ -32,6 +33,8 @@ const Contact = () => {
     message: "",
   });
 
+  const [phoneError, setPhoneError] = useState("");
+
   useEffect(() => {
     fetch(`${BASE_URL}/api/products`)
       .then((res) => res.json())
@@ -45,6 +48,14 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate phone: must be exactly 10 digits
+    const cleanPhone = formData.phone.replace(/\s+/g, "");
+    if (!/^\d{10}$/.test(cleanPhone)) {
+      setPhoneError("Please enter a valid 10-digit phone number.");
+      return;
+    }
+    setPhoneError("");
 
     const form = new FormData();
     form.append("name", formData.name);
@@ -69,6 +80,7 @@ const Contact = () => {
       if (res.ok) {
         alert("Enquiry sent successfully");
         setFormData({ name: "", phone: "", message: "" });
+        setPhoneError("");
         setActiveSeries("");
         setSelectedProduct(null);
         setCustomImage(null);
@@ -187,11 +199,38 @@ const Contact = () => {
               <label>Phone Number</label>
               <input
                 required
+                maxLength={10}
+                placeholder="Enter 10-digit mobile number"
                 value={formData.phone}
-                onChange={(e) =>
-                  setFormData({ ...formData, phone: e.target.value })
-                }
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, "").slice(0, 10);
+                  setFormData({ ...formData, phone: val });
+                  if (val.length > 0 && val.length < 10) {
+                    setPhoneError(`${10 - val.length} more digit${10 - val.length > 1 ? "s" : ""} needed`);
+                  } else if (val.length === 10) {
+                    setPhoneError("");
+                  } else {
+                    setPhoneError("");
+                  }
+                }}
+                style={{
+                  borderColor: phoneError ? "#e53e3e" : undefined,
+                  boxShadow: phoneError ? "0 0 0 3px rgba(229,62,62,0.15)" : undefined
+                }}
               />
+              {phoneError && (
+                <p style={{
+                  color: "#e53e3e",
+                  fontSize: "12px",
+                  marginTop: "6px",
+                  fontFamily: "Inter, sans-serif",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "4px"
+                }}>
+                  ⚠ {phoneError}
+                </p>
+              )}
             </div>
 
             <div className="field-group">

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import "./AdminDashboard.css";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
-
 const SERIES = [
   "Fabula Series",
   "Endless Surface",
@@ -20,6 +19,14 @@ const CATEGORIES = [
   "Marble Surface",
   "Porce Surface",
   "GHR Surface"
+];
+
+// Quick reply templates
+const QUICK_REPLIES = [
+  "Thank you for your enquiry! We have received your details and will reach you shortly.",
+  "We have noted your enquiry. Our team will call you within 24 hours.",
+  "Thank you for your interest in our tiles. We will get back to you shortly with more details.",
+  "We have received your request. Our showroom executive will call you soon to assist you further.",
 ];
 
 function AdminDashboard() {
@@ -45,6 +52,12 @@ function AdminDashboard() {
   const [profileForm, setProfileForm] = useState({ email: "", password: "" });
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileMsg, setProfileMsg] = useState("");
+
+  // Reply state — keyed by enquiry id
+  const [replyOpen, setReplyOpen] = useState({});     // { [id]: true/false }
+  const [replyText, setReplyText] = useState({});      // { [id]: string }
+  const [replySending, setReplySending] = useState({}); // { [id]: true/false }
+  const [replySent, setReplySent] = useState({});      // { [id]: true/false }
 
   const fetchProducts = async () => {
     const res = await fetch(`${BASE_URL}/api/products`);
@@ -162,6 +175,44 @@ function AdminDashboard() {
       setProfileMsg("Failed to update profile.");
     }
     setProfileLoading(false);
+  };
+
+  // ── REPLY HANDLERS ──
+  const toggleReply = (id) => {
+    setReplyOpen(prev => ({ ...prev, [id]: !prev[id] }));
+    // Pre-fill with first quick reply if empty
+    if (!replyText[id]) {
+      setReplyText(prev => ({ ...prev, [id]: QUICK_REPLIES[0] }));
+    }
+  };
+
+  const handleQuickReply = (id, text) => {
+    setReplyText(prev => ({ ...prev, [id]: text }));
+  };
+
+  const handleSendReply = (enquiry) => {
+    const id = enquiry._id;
+    const message = replyText[id];
+    if (!message?.trim()) return;
+
+    if (!enquiry.phone) {
+      alert("No phone number found for this customer.");
+      return;
+    }
+
+    // Normalise to international format 91XXXXXXXXXX (no + needed for wa.me)
+    const digits = enquiry.phone.replace(/\D/g, "");
+    const intlPhone = digits.startsWith("91") ? digits : `91${digits}`;
+
+    // Opens WhatsApp Web in a new tab with number + message pre-filled
+    // Admin just clicks Send inside WhatsApp Web — zero API needed
+    const waLink = `https://wa.me/${intlPhone}?text=${encodeURIComponent(message)}`;
+    window.open(waLink, "_blank");
+
+    // Mark as sent in UI
+    setReplySent(prev => ({ ...prev, [id]: true }));
+    setReplyOpen(prev => ({ ...prev, [id]: false }));
+    setTimeout(() => setReplySent(prev => ({ ...prev, [id]: false })), 4000);
   };
 
   const NAV_TABS = [
@@ -416,45 +467,126 @@ function AdminDashboard() {
                 Enquiry Details
                 <span className="count-pill">{enquiries.length}</span>
               </h2>
-              <p className="card-sub">All customer enquiries</p>
+              <p className="card-sub">View and reply to customer enquiries</p>
             </div>
 
             {enquiries.length === 0 ? (
               <div className="empty-state">No enquiries received yet.</div>
             ) : (
               <div className="enquiry-grid">
-                {enquiries.map((e, i) => (
-                  <div className="enquiry-card" key={e._id || i}>
-                    <div className="enquiry-img-wrap">
-                      {e.tileImage ? (
-                        <img
-                          src={`${BASE_URL}${e.tileImage}`}
-                          alt={e.tileName || "Tile"}
-                          className="enquiry-img"
-                        />
-                      ) : (
-                        <div className="enquiry-no-img">No Image</div>
-                      )}
-                    </div>
-                    <div className="enquiry-body">
-                      <div className="enquiry-top-row">
-                        <span className="enquiry-name">{e.name}</span>
-                        <span className="enquiry-date">
-                          {e.createdAt ? new Date(e.createdAt).toLocaleDateString() : "—"}
-                        </span>
+                {enquiries.map((e, i) => {
+                  const id = e._id || i;
+                  const isOpen = replyOpen[id];
+                  const isSent = replySent[id];
+                  const isSending = replySending[id];
+
+                  return (
+                    <div className={`enquiry-card ${isOpen ? "reply-expanded" : ""}`} key={id}>
+
+                      {/* Tile image */}
+                      <div className="enquiry-img-wrap">
+                        {e.tileImage ? (
+                          <img
+                            src={`${BASE_URL}${e.tileImage}`}
+                            alt={e.tileName || "Tile"}
+                            className="enquiry-img"
+                          />
+                        ) : (
+                          <div className="enquiry-no-img">No Image</div>
+                        )}
                       </div>
-                      {e.phone && (
-                        <p className="enquiry-phone">📞 {e.phone}</p>
+
+                      {/* Body */}
+                      <div className="enquiry-body">
+                        <div className="enquiry-top-row">
+                          <span className="enquiry-name">{e.name}</span>
+                          <span className="enquiry-date">
+                            {e.createdAt ? new Date(e.createdAt).toLocaleDateString() : "—"}
+                          </span>
+                        </div>
+                        {e.phone && <p className="enquiry-phone">📞 {e.phone}</p>}
+                        {e.email && <p className="enquiry-email">✉️ {e.email}</p>}
+                        {e.tileName && <p className="enquiry-tile-name">🪟 {e.tileName}</p>}
+                        {e.message && <p className="enquiry-message">{e.message}</p>}
+
+                        {/* Reply success banner */}
+                        {isSent && (
+                          <div className="reply-sent-banner">
+                            ✓ Reply sent successfully
+                          </div>
+                        )}
+
+                        {/* Reply toggle button */}
+                        <button
+                          className={`btn-reply-toggle ${isOpen ? "open" : ""}`}
+                          onClick={() => toggleReply(id)}
+                        >
+                          {isOpen ? "✕ Close Reply" : "↩ Reply to Customer"}
+                        </button>
+                      </div>
+
+                      {/* Reply panel — slides open */}
+                      {isOpen && (
+                        <div className="reply-panel">
+                          <div className="reply-panel-head">
+                            <span className="reply-to-label">
+                              Replying to: <strong>{e.name}</strong>
+                              {e.phone
+                                ? <span className="reply-to-phone"> · 📱 {e.phone}</span>
+                                : <span style={{color:"#e53e3e"}}> · ⚠ No phone number</span>
+                              }
+                            </span>
+                            <p style={{fontSize:"12px",color:"#888",marginTop:"6px",fontStyle:"italic"}}>
+                              WhatsApp Web opens in a new tab with this message pre-filled — just press Send.
+                            </p>
+                          </div>
+
+                          {/* Quick reply chips */}
+                          <div className="quick-reply-chips">
+                            <span className="chips-label">Quick Replies:</span>
+                            {QUICK_REPLIES.map((qr, qi) => (
+                              <button
+                                key={qi}
+                                className={`chip ${replyText[id] === qr ? "chip-active" : ""}`}
+                                onClick={() => handleQuickReply(id, qr)}
+                              >
+                                {qi + 1}. {qr.slice(0, 40)}…
+                              </button>
+                            ))}
+                          </div>
+
+                          {/* Message textarea */}
+                          <textarea
+                            className="reply-textarea"
+                            rows={4}
+                            placeholder="Type your reply here…"
+                            value={replyText[id] || ""}
+                            onChange={(ev) =>
+                              setReplyText(prev => ({ ...prev, [id]: ev.target.value }))
+                            }
+                          />
+
+                          <div className="reply-actions">
+                            <button
+                              className="btn-secondary"
+                              onClick={() => toggleReply(id)}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              className="btn-send-reply"
+                              disabled={!replyText[id]?.trim() || !e.phone}
+                              onClick={() => handleSendReply(e)}
+                            >
+                              💬 Send on WhatsApp
+                            </button>
+                          </div>
+                        </div>
                       )}
-                      {e.tileName && (
-                        <p className="enquiry-tile-name">🪟 {e.tileName}</p>
-                      )}
-                      {e.message && (
-                        <p className="enquiry-message">{e.message}</p>
-                      )}
+
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

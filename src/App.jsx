@@ -9,6 +9,8 @@ import ProductPreview from "./pages/ProductPreview";
 import Visualize from "./pages/visualize";
 import AdminDashboard from "./pages/AdminDashboard";
 import MatchTiles from "./pages/MatchTiles";
+import TileCalculator from "./pages/TileCalculator";
+
 
 function App() {
   return (
@@ -25,7 +27,7 @@ function App() {
           <Route path="/visualize/:id" element={<Visualize />} />
 <Route path="/admin" element={<AdminDashboard />} />
 <Route path="/match-tiles" element={<MatchTiles />} />
-
+<Route path="/tile-calculator" element={<TileCalculator />} />
         </Routes>
       </div>
 
