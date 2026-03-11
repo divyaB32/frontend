@@ -27,7 +27,6 @@
   cursor: pointer;
 }
 
-/* ROOM SELECTOR */
 .room-selector {
   display: flex;
   gap: 14px;
@@ -62,7 +61,6 @@
   border-color: #b68b5a;
 }
 
-/* FLOOR / WALL */
 .surface-toggle {
   display: flex;
   gap: 10px;
@@ -81,7 +79,6 @@
   color: #fff;
 }
 
-/* LAYOUT */
 .visualize-wrapper {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
@@ -109,16 +106,18 @@
   background-repeat: repeat;
   background-size: 260px 260px;
   background-position: center;
+  background-color: white;
+
   -webkit-mask-size: cover;
   mask-size: cover;
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   -webkit-mask-position: center;
   mask-position: center;
+
   pointer-events: none;
 }
 
-/* INFO */
 .visualize-info h2 {
   font-size: 26px;
   margin-bottom: 10px;
@@ -129,24 +128,9 @@
   color: #555;
 }
 
-/* ===============================
-   MOBILE FIX
-================================ */
 @media (max-width: 768px) {
-  .visualize-modal {
-    padding: 14px;
-  }
-
-  .visualize-wrapper {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
-
-  .tile-overlay {
-    background-size: 180px 180px;
-  }
-
-  .visualize-info h2 {
-    font-size: 20px;
-  }
+  .visualize-modal { padding: 14px; }
+  .visualize-wrapper { grid-template-columns: 1fr; gap: 18px; }
+  .tile-overlay { background-size: 180px 180px; }
+  .visualize-info h2 { font-size: 20px; }
 }
