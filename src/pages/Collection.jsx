@@ -18,7 +18,7 @@ const Collection = () => {
   const [activeSeries, setActiveSeries] = useState("Fabula Series");
   const [activeCategory, setActiveCategory] = useState("");
 
-  // ✅ NEW: SEARCH STATE
+  // ✅ SEARCH STATE
   const [search, setSearch] = useState("");
 
   const navigate = useNavigate();
@@ -34,7 +34,6 @@ const Collection = () => {
       });
   }, []);
 
-  // EXISTING dropdown categories (UNCHANGED)
   const endlessCategories = [
     "Polished Surface",
     "HI Surface",
@@ -43,22 +42,26 @@ const Collection = () => {
     "GHR Surface",
   ];
 
-  // ✅ SEARCH + EXISTING FILTER LOGIC (SAFE)
+  // ✅ FIXED FILTER LOGIC
   const filteredProducts = products.filter((product) => {
-    // series/category logic (UNCHANGED)
-    if (activeSeries === "Endless Surface") {
-      if (!activeCategory) return false;
+    const productSeries = product.series?.toLowerCase().trim();
+    const productCategory = product.category?.toLowerCase().trim();
+    const selectedSeries = activeSeries.toLowerCase().trim();
+    const selectedCategory = activeCategory.toLowerCase().trim();
+
+    if (selectedSeries === "endless surface") {
+      if (!selectedCategory) return false;
       if (
-        product.series !== "Endless Surface" ||
-        product.category !== activeCategory
+        productSeries !== "endless surface" ||
+        productCategory !== selectedCategory
       ) {
         return false;
       }
     } else {
-      if (product.series !== activeSeries) return false;
+      if (productSeries !== selectedSeries) return false;
     }
 
-    // ✅ search filter
+    // search filter
     if (!search) return true;
 
     const q = search.toLowerCase();
@@ -80,7 +83,6 @@ const Collection = () => {
           enchanting color combinations.
         </p>
 
-        {/* ✅ SEARCH BAR (NEW) */}
         <div className="collection-search">
           <input
             type="text"
@@ -90,7 +92,6 @@ const Collection = () => {
           />
         </div>
 
-        {/* SERIES TABS */}
         <div className="series-tabs scroll-x">
           {[
             "Fabula Series",
